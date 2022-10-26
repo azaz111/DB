@@ -1,10 +1,10 @@
 import os
-from time import sleep
+from time import sleep , time
 import ast
 import subprocess
 import paramiko
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timedelta, time, date
+from datetime import datetime, timedelta
 try:
    import pymysql
    from sshtunnel import SSHTunnelForwarder
@@ -35,7 +35,7 @@ def reqest_sql_get():
        s_data=pr_data[pr_data.find(r'\r\n(')+5:pr_data.find(r')\r\n\x1b')]
        #print(s_data)
        kort=ast.literal_eval(s_data)
-       rz= kort[0],kort[1],kort[2],kort[3]
+       rz= kort[0],kort[1],kort[2],kort[3],kort[4]
     except SyntaxError:
        rz= None
     finally:
@@ -47,18 +47,15 @@ def reqest_sql_set(id_true):
     ssh.send(f'python3 get_set.py set {id_true} \n')
     ssh.close()
 
-
 def reqest_sql_set_false(id_true):
     ssh=connect('74.207.227.175','JSoU9PPV')
     ssh.send(f'python3 get_set.py False {id_true} \n')
     ssh.close()
 
-
 def reqest_sql_set_potok(id_p):
     ssh=connect('74.207.227.175','JSoU9PPV')
     ssh.send(f'python3 get_set.py potok {id_p} \n')
     ssh.close()
-
 
 def connect(host,passw):
    for ttt in range(16):
@@ -92,7 +89,6 @@ def getConnection():
                       password='Q12w3e4003r!', database='credentals',
                       cursorclass=pymysql.cursors.DictCursor)
     return connection
-
 
 def download_token():
    server.start()
@@ -144,7 +140,7 @@ def new_config(sektor): # Получаем токен dropbox и записыв�
 
 def drive_new_config(sektor): # Получаем токен  GDrive и записываем в конфиг
    d_tokens=reqest_sql_get()
-   #print(d_tokens)
+   print(d_tokens)
    token_read=open("osnova_token.txt", 'r').read()[:-1]
    if d_tokens:
       with open('/root/.config/rclone/rclone.conf', 'a') as f:
@@ -156,7 +152,6 @@ def drive_new_config(sektor): # Получаем токен  GDrive и запи�
       return drive_new_config(sektor)
    return d_tokens
 
-
 def trak(t):
    for x in  range(10):
       sleep(8)
@@ -166,27 +161,35 @@ def stat_progect(potok): # передача с помощью суб проце�
    print("Старт потока ",potok)
    try:
       some_date = datetime.now()
+      start_time= time()
       # Формируем токены и файл для передачи 
-      id_db=new_config(potok)
+      id_db=new_config(potok) 
       data_drive=drive_new_config(potok)
       id_gd=data_drive[0]
       # Формируем Команду 
-      com=f'rclone copy osnova_{potok}:{data_drive[2]}/{data_drive[3]} dbox_{potok}: --drive-stop-on-upload-limit --transfers 1 -P -v --log-file /root/rclone1.log'
+      com=f'rclone copy osnova_{potok}:{data_drive[2]}/{data_drive[3]} dbox_{potok}: --drive-stop-on-upload-limit --transfers 1 -P --drive-service-account-file "/root/DB/accounts/{data_drive[4]}" -v --log-file /root/rclone1.log'
+      print(com)
       comls= com.split(' ')
       process = subprocess.Popen(comls, stdout=subprocess.PIPE, universal_newlines=True)
-      print( str(process.pid) )
+      #print( str(process.pid) )
       while True:
          line = process.stdout.readline()
-         print(line)
-         if line.find('Transferred:')>-1:
+         #print(line)
+         #input("["+line+"]")
+         if line.find('*')>-1:
              sleep(8)
-             print('['+str(process.pid)+'] - '+line)
-         if not line:
+             trans=line.find('Transferred')
+             print('['+str(process.pid)+'] - '+line[:])
+         elif line.find('Errors:                 1 ')>-1:
+            #apobj.notify(body=f'!!! 🚨 Ошибка RCLONE')
+            break
+         elif not line:
             break
       print('['+str(process.pid)+'] - PEREDAN vernem True id' + str(id_db))
       now_date = datetime.now()
-      apobj.notify(body=f'✅ Передан 🕰️ Время выполнения {timedelta(seconds=a.seconds)}')
-      if now_date - some_date > 2000:
+      a=now_date - some_date
+      if time() - start_time > 2000:
+         apobj.notify(body=f'✅ Передан 🕰️ Время выполнения {timedelta(seconds=a.seconds)}')
          print("Долго выходити  подтвердим")
          reqest_sql_set(id_gd)
       else:
@@ -195,15 +198,14 @@ def stat_progect(potok): # передача с помощью суб проце�
       reqest_sql_set_potok(data_drive[1])
       vernem_true(id_db, f'dbox_{potok}')
    except Exception as err: 
-      apobj.notify(body=f'🚨 Ошибока {err}')
-
+      apobj.notify(body=f'🚨 Ошибка {err}')
+      print(f'[ERROR] {err}')
 
 def main(): 
-   executor =ThreadPoolExecutor(max_workers=6)
+   executor =ThreadPoolExecutor(max_workers=1)
    for x in range(1,10000):
       sleep(5)
       executor.submit(stat_progect,x)
-
 
 if __name__ == '__main__':
    try:
