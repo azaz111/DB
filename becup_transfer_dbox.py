@@ -98,6 +98,7 @@ def download_token(): # Скачиваем  свободный  токен др�
    print(len(rows))
    if len(rows) == 0:
       print('Нет свободных токенов !!!')
+      logger.error(f"🚨 Нет свободных токенов !!! ")
       mybd.commit()
       mybd.close()
       server.stop()
@@ -152,9 +153,7 @@ def drive_new_config(sektor): # Получаем токен  GDrive и запи�
    return d_tokens
 
 def stat_progect(potok): # передача с помощью суб процесса
-   #print("Старт потока ",potok)
    logger.debug(f"Старт потока {potok}")
-
    try:
       some_date = datetime.now()
       start_time= time()
@@ -162,13 +161,13 @@ def stat_progect(potok): # передача с помощью суб проце�
       id_db=new_config(potok) 
       data_drive=drive_new_config(potok)
       id_gd=data_drive[0]
-      logger.info(f'[{(process.pid)}] Start {data_drive[3]}')
       # Формируем Команду 
       com=f'rclone copy osnova_{potok}:{data_drive[2]}/{data_drive[3]} dbox_{potok}: --drive-stop-on-upload-limit --transfers 1 -P --dropbox-chunk-size 150Mi --drive-service-account-file /root/DB/accounts/{data_drive[4]} -v --log-file /root/rclone1.log'
       print(com)
       comls= com.split(' ')
       process = subprocess.Popen(comls, stdout=subprocess.PIPE, universal_newlines=True)
       print( str(process.pid) )
+      logger.info(f'[{(process.pid)}] Start {data_drive[3]}')
       sleep(5)
       while True:
          line = process.stdout.readline()
@@ -197,7 +196,7 @@ def stat_progect(potok): # передача с помощью суб проце�
    except Exception as err: 
       apobj.notify(body=f'🚨 Ошибка {err}')
       logger.error(f"🚨 Ошибка {err}")
-      print(f'[ERROR] {err}')
+      #print(f'[ERROR] {err}')
       
 
 def main(): 
