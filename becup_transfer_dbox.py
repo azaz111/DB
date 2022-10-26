@@ -167,11 +167,12 @@ def stat_progect(potok): # передача с помощью суб проце�
       data_drive=drive_new_config(potok)
       id_gd=data_drive[0]
       # Формируем Команду 
-      com=f'rclone copy osnova_{potok}:{data_drive[2]}/{data_drive[3]} dbox_{potok}: --drive-stop-on-upload-limit --transfers 1 -P --drive-service-account-file "/root/DB/accounts/{data_drive[4]}" -v --log-file /root/rclone1.log'
+      com=f'rclone copy osnova_{potok}:{data_drive[2]}/{data_drive[3]} dbox_{potok}: --drive-stop-on-upload-limit --transfers 1 -P --drive-service-account-file /root/DB/accounts/{data_drive[4]} -v --log-file /root/rclone1.log'
       print(com)
       comls= com.split(' ')
       process = subprocess.Popen(comls, stdout=subprocess.PIPE, universal_newlines=True)
-      #print( str(process.pid) )
+      print( str(process.pid) )
+      sleep(5)
       while True:
          line = process.stdout.readline()
          #print(line)
@@ -181,10 +182,10 @@ def stat_progect(potok): # передача с помощью суб проце�
              trans=line.find('Transferred')
              print('['+str(process.pid)+'] - '+line[:])
          elif line.find('Errors:                 1 ')>-1:
-            #apobj.notify(body=f'!!! 🚨 Ошибка RCLONE')
+            apobj.notify(body=f'!!! 🚨 Ошибка RCLONE')
             break
-         elif not line:
-            break
+         #elif not line:
+         #   break
       print('['+str(process.pid)+'] - PEREDAN vernem True id' + str(id_db))
       now_date = datetime.now()
       a=now_date - some_date
@@ -198,7 +199,7 @@ def stat_progect(potok): # передача с помощью суб проце�
       reqest_sql_set_potok(data_drive[1])
       vernem_true(id_db, f'dbox_{potok}')
    except Exception as err: 
-      apobj.notify(body=f'🚨 Ошибка {err}')
+      #apobj.notify(body=f'🚨 Ошибка {err}')
       print(f'[ERROR] {err}')
 
 def main(): 
