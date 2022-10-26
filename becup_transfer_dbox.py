@@ -10,18 +10,22 @@ try:
    from sshtunnel import SSHTunnelForwarder
    import apprise
    import paramiko
+   from loguru import logger
 except:
    os.system('pip install pymysql')
    os.system('pip install sshtunnel')
    os.system('pip install apprise')
    os.system('pip install paramiko')
+   os.system('pip install loguru')
    import pymysql
    from sshtunnel import SSHTunnelForwarder
    import apprise
    import paramiko
+   from loguru import logger
 
 apobj = apprise.Apprise()
 apobj.add('tgram://5458358981:AAHmEsED5yN09uD2yNrpFdi9lBia7yZ59CQ/183787479')
+logger.add('logger_beckup.log', format="{time} - {level} - {message}")
 n=0
 tabl='dbox_bec'
 
@@ -52,12 +56,7 @@ def reqest_sql_set_false(id_true):
     ssh.send(f'python3 get_set.py False {id_true} \n')
     ssh.close()
 
-def reqest_sql_set_potok(id_p):
-    ssh=connect('74.207.227.175','JSoU9PPV')
-    ssh.send(f'python3 get_set.py potok {id_p} \n')
-    ssh.close()
-
-def connect(host,passw):
+def connect(host,passw): # соеденение paramico
    for ttt in range(16):
        try:
          ssh = paramiko.SSHClient()
@@ -78,19 +77,19 @@ def connect(host,passw):
          ssh=False
    return ssh
 
-server = SSHTunnelForwarder(
+server = SSHTunnelForwarder( # Тонель к серверу msql
     ('149.248.8.216', 22),
     ssh_username='root',
     ssh_password='XUVLWMX5TEGDCHDU',
     remote_bind_address=('127.0.0.1', 3306))
 
-def getConnection(): 
+def getConnection(): # соеденение msql
     connection = pymysql.connect(host='127.0.0.1', port=server.local_bind_port, user='chai_cred',
                       password='Q12w3e4003r!', database='credentals',
                       cursorclass=pymysql.cursors.DictCursor)
     return connection
 
-def download_token():
+def download_token(): # Скачиваем  свободный  токен дропбокса с минимальным количеством плотов
    server.start()
    mybd = getConnection()
    cur = mybd.cursor()
@@ -113,7 +112,7 @@ def download_token():
    server.stop()
    return [token,id]
 
-def vernem_true(id_v , conf_d):
+def vernem_true(id_v , conf_d): # Меняем статус дропбокса и считаем плоты
    try:
       com=f'rclone ls {conf_d}:'
       comls= com.split(' ')
@@ -152,13 +151,9 @@ def drive_new_config(sektor): # Получаем токен  GDrive и запи�
       return drive_new_config(sektor)
    return d_tokens
 
-def trak(t):
-   for x in  range(10):
-      sleep(8)
-      print(t)
-
 def stat_progect(potok): # передача с помощью суб процесса
-   print("Старт потока ",potok)
+   #print("Старт потока ",potok)
+   logger.debug(f"Старт потока {potok}")
    try:
       some_date = datetime.now()
       start_time= time()
@@ -166,6 +161,7 @@ def stat_progect(potok): # передача с помощью суб проце�
       id_db=new_config(potok) 
       data_drive=drive_new_config(potok)
       id_gd=data_drive[0]
+      logger.info(f'[{(process.pid)}] Start {data_drive[3]}')
       # Формируем Команду 
       com=f'rclone copy osnova_{potok}:{data_drive[2]}/{data_drive[3]} dbox_{potok}: --drive-stop-on-upload-limit --transfers 1 -P --drive-service-account-file /root/DB/accounts/{data_drive[4]} -v --log-file /root/rclone1.log'
       print(com)
@@ -182,25 +178,26 @@ def stat_progect(potok): # передача с помощью суб проце�
              trans=line.find('Transferred')
              print('['+str(process.pid)+'] - '+line[:trans])
          elif line.find('Errors:                 1 ')>-1:
-            apobj.notify(body=f'!!! 🚨 Ошибка RCLONE')
+            apobj.notify(body=f'🚨 Ошибка RCLONE')
+            logger.error(f"🚨 Ошибка RCLONE {potok}")
             break
-         #elif not line:
-         #   break
-      print('['+str(process.pid)+'] - PEREDAN vernem True id' + str(id_db))
+         elif not line:
+            break
       now_date = datetime.now()
+      logger.info(f'[{(process.pid)}] Время выполнения {timedelta(seconds=a.seconds)} PEREDAN : {data_drive[3]}')
       a=now_date - some_date
       if time() - start_time > 2000:
          apobj.notify(body=f'✅ Передан 🕰️ Время выполнения {timedelta(seconds=a.seconds)}')
-         print("Долго выходити  подтвердим")
          reqest_sql_set(id_gd)
       else:
          reqest_sql_set_false(id_gd)
          print("Быстрый выход вернем False")
-      reqest_sql_set_potok(data_drive[1])
       vernem_true(id_db, f'dbox_{potok}')
    except Exception as err: 
-      #apobj.notify(body=f'🚨 Ошибка {err}')
+      apobj.notify(body=f'🚨 Ошибка {err}')
+      logger.error(f"🚨 Ошибка {err}")
       print(f'[ERROR] {err}')
+      
 
 def main(): 
    executor =ThreadPoolExecutor(max_workers=9)
