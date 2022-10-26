@@ -148,6 +148,7 @@ def drive_new_config(sektor): # Получаем токен  GDrive и запи�
       sleep(2) 
    else:
       print(" Нет доступных фалов или доступа к базе ")
+      logger.error(f"🚨 Нет доступных фалов или доступа к базе 'drive' ")
       sleep(20)
       return drive_new_config(sektor)
    return d_tokens
@@ -184,8 +185,8 @@ def stat_progect(potok): # передача с помощью суб проце�
          elif not line:
             break
       now_date = datetime.now()
-      logger.info(f'[{(process.pid)}] Время выполнения {timedelta(seconds=a.seconds)} PEREDAN : {data_drive[3]}')
       a=now_date - some_date
+      logger.info(f'[{(process.pid)}] Время выполнения {timedelta(seconds=a.seconds)} PEREDAN : {data_drive[3]}')
       if time() - start_time > 2000:
          apobj.notify(body=f'✅ Передан 🕰️ Время выполнения {timedelta(seconds=a.seconds)}')
          reqest_sql_set(id_gd)
