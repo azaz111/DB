@@ -180,7 +180,7 @@ def stat_progect(potok): # передача с помощью суб проце�
          if line.find('*')>-1:
              sleep(8)
              trans=line.find('Transferred')
-             print('['+str(process.pid)+'] - '+line[:])
+             print('['+str(process.pid)+'] - '+line[:trans])
          elif line.find('Errors:                 1 ')>-1:
             apobj.notify(body=f'!!! 🚨 Ошибка RCLONE')
             break
@@ -203,7 +203,7 @@ def stat_progect(potok): # передача с помощью суб проце�
       print(f'[ERROR] {err}')
 
 def main(): 
-   executor =ThreadPoolExecutor(max_workers=1)
+   executor =ThreadPoolExecutor(max_workers=9)
    for x in range(1,10000):
       sleep(5)
       executor.submit(stat_progect,x)
