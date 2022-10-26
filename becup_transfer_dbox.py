@@ -154,6 +154,7 @@ def drive_new_config(sektor): # Получаем токен  GDrive и запи�
 def stat_progect(potok): # передача с помощью суб процесса
    #print("Старт потока ",potok)
    logger.debug(f"Старт потока {potok}")
+
    try:
       some_date = datetime.now()
       start_time= time()
@@ -163,7 +164,7 @@ def stat_progect(potok): # передача с помощью суб проце�
       id_gd=data_drive[0]
       logger.info(f'[{(process.pid)}] Start {data_drive[3]}')
       # Формируем Команду 
-      com=f'rclone copy osnova_{potok}:{data_drive[2]}/{data_drive[3]} dbox_{potok}: --drive-stop-on-upload-limit --transfers 1 -P --drive-service-account-file /root/DB/accounts/{data_drive[4]} -v --log-file /root/rclone1.log'
+      com=f'rclone copy osnova_{potok}:{data_drive[2]}/{data_drive[3]} dbox_{potok}: --drive-stop-on-upload-limit --transfers 1 -P --dropbox-chunk-size 150Mi --drive-service-account-file /root/DB/accounts/{data_drive[4]} -v --log-file /root/rclone1.log'
       print(com)
       comls= com.split(' ')
       process = subprocess.Popen(comls, stdout=subprocess.PIPE, universal_newlines=True)
