@@ -157,7 +157,7 @@ def stat_progect(potok): # передача с помощью суб проце�
       
 
 def main(): 
-   executor =ThreadPoolExecutor(max_workers=40)
+   executor =ThreadPoolExecutor(max_workers=25)
    for x in range(1,10000):
       sleep(5)
       executor.submit(stat_progect,x)
