@@ -1,3 +1,4 @@
+from dataclasses import replace
 import os
 from time import sleep , time
 import ast
@@ -5,6 +6,7 @@ import subprocess
 import paramiko
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
+import re
 try:
    import pymysql
    from sshtunnel import SSHTunnelForwarder
@@ -34,12 +36,16 @@ def reqest_sql_get():
     ssh.send(f'python3 get_set.py get \n')
     sleep(2)
     pr_data=str(ssh.recv(5000))
-    #print(str(ssh.recv(5000)))
+    #print(pr_data)
     try:
        s_data=pr_data[pr_data.find(r'\r\n(')+5:pr_data.find(r')\r\n\x1b')]
-       #print(s_data)
+       try:
+          s_data=re.sub(r'\\', '', s_data)
+       except:
+         pass
        kort=ast.literal_eval(s_data)
-       rz= kort[0],kort[1],kort[2],kort[3],kort[4]
+       #print(kort)
+       rz= kort[0],kort[1],kort[2],kort[3],kort[4],kort[5]
     except SyntaxError:
        rz= None
     finally:
@@ -77,75 +83,18 @@ def connect(host,passw): # соеденение paramico
          ssh=False
    return ssh
 
-server = SSHTunnelForwarder( # Тонель к серверу msql
-    ('149.248.8.216', 22),
-    ssh_username='root',
-    ssh_password='XUVLWMX5TEGDCHDU',
-    remote_bind_address=('127.0.0.1', 3306))
-
-def getConnection(): # соеденение msql
-    connection = pymysql.connect(host='127.0.0.1', port=server.local_bind_port, user='chai_cred',
-                      password='Q12w3e4003r!', database='credentals',
-                      cursorclass=pymysql.cursors.DictCursor)
-    return connection
-
-def download_token(): # Скачиваем  свободный  токен дропбокса с минимальным количеством плотов
-   server.start()
-   mybd = getConnection()
-   cur = mybd.cursor()
-   cur.execute( f"SELECT * FROM {tabl} WHERE len=(SELECT min(len) FROM {tabl}) and status = 'True' " ) # запросим все данные  
-   rows = cur.fetchall()
-   print(len(rows))
-   if len(rows) == 0:
-      print('Нет свободных токенов !!!')
-      logger.error(f"🚨 Нет свободных токенов !!! ")
-      mybd.commit()
-      mybd.close()
-      server.stop()
-      sleep(20)
-      return download_token()
-   token=rows[0]['token']
-   print(token)
-   id=rows[0]['id']
-   cur.execute( f"UPDATE {tabl} set status = 'False' WHERE id = {rows[0]['id']} ") # Обнавление данных
-   mybd.commit()
-   mybd.close()
-   server.stop()
-   return [token,id]
-
-def vernem_true(id_v , conf_d): # Меняем статус дропбокса и считаем плоты
-   try:
-      com=f'rclone ls {conf_d}:'
-      comls= com.split(' ')
-      process = subprocess.Popen(comls, stdout=subprocess.PIPE)
-      process.wait()
-      stat_len=len(str(process.communicate()[0]).split('\\n'))
-      print('[ ! ] Plot account ' , str(stat_len))
-   except:
-      stat_len='error'
-
-   server.start()
-   mybd = getConnection()
-   cur = mybd.cursor()
-   cur.execute( f"UPDATE {tabl} set status = 'True' , len = '{stat_len}'  WHERE id = {id_v}") # Обнавление данных
-   mybd.commit()
-   mybd.close()
-   server.stop()
-
-def new_config(sektor): # Получаем токен dropbox и записываем в конфиг
-   tokens=download_token()
-   with open('/root/.config/rclone/rclone.conf', 'a') as f:
-       f.write(f'\n[dbox_{sektor}]\ntype = dropbox\ntoken = {tokens[0]}\n')
-   return tokens[1]
-
-def drive_new_config(sektor): # Получаем токен  GDrive и записываем в конфиг
+def drive_new_config(sektor): # Получаем токены
    d_tokens=reqest_sql_get()
    print(d_tokens)
    token_read=open("osnova_token.txt", 'r').read()[:-1]
    if d_tokens:
+      # GDrive и записываем в конфиг
       with open('/root/.config/rclone/rclone.conf', 'a') as f:
          f.write(f'\n[osnova_{sektor}]\ntype = drive\nscope = drive\ntoken = {token_read}\nteam_drive = {d_tokens[1]}\n')
-      sleep(2) 
+      sleep(2)
+      # dropbox и записываем в конфиг
+      with open('/root/.config/rclone/rclone.conf', 'a') as f:
+        f.write(f'\n[dbox_{sektor}]\ntype = dropbox\ntoken = {d_tokens[5]}\n')
    else:
       print(" Нет доступных фалов или доступа к базе ")
       logger.error(f"🚨 Нет доступных фалов или доступа к базе 'drive' ")
@@ -159,7 +108,6 @@ def stat_progect(potok): # передача с помощью суб проце�
       some_date = datetime.now()
       start_time= time()
       # Формируем токены и файл для передачи 
-      id_db=new_config(potok) 
       data_drive=drive_new_config(potok)
       id_gd=data_drive[0]
       # Формируем Команду 
@@ -193,7 +141,6 @@ def stat_progect(potok): # передача с помощью суб проце�
       else:
          reqest_sql_set_false(id_gd)
          print("Быстрый выход вернем False")
-      vernem_true(id_db, f'dbox_{potok}')
    except Exception as err: 
       apobj.notify(body=f'🚨 Ошибка {err}')
       logger.error(f"🚨 Ошибка {err}")
@@ -201,7 +148,7 @@ def stat_progect(potok): # передача с помощью суб проце�
       
 
 def main(): 
-   executor =ThreadPoolExecutor(max_workers=9)
+   executor =ThreadPoolExecutor(max_workers=1)
    for x in range(1,10000):
       sleep(5)
       executor.submit(stat_progect,x)
@@ -212,4 +159,3 @@ if __name__ == '__main__':
    except:
       pass
    main()
-
