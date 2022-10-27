@@ -62,6 +62,14 @@ def reqest_sql_set_false(id_true):
     ssh.send(f'python3 get_set.py False {id_true} \n')
     ssh.close()
 
+def reqest_sql_ok(id_true):
+    ssh=connect('74.207.227.175','JSoU9PPV')
+    ssh.send(f'python3 get_set.py ok {id_true} \n')
+    sleep(5)
+    pr_data=str(ssh.recv(5000))
+    print(pr_data)
+    ssh.close()
+
 def connect(host,passw): # соеденение paramico
    for ttt in range(16):
        try:
@@ -135,6 +143,7 @@ def stat_progect(potok): # передача с помощью суб проце�
       now_date = datetime.now()
       a=now_date - some_date
       logger.info(f'[{(process.pid)}] Время выполнения {timedelta(seconds=a.seconds)} PEREDAN : {data_drive[3]}')
+      reqest_sql_ok(data_drive[3])
       if time() - start_time > 2000:
          apobj.notify(body=f'✅ Передан 🕰️ Время выполнения {timedelta(seconds=a.seconds)}')
          reqest_sql_set(id_gd)
