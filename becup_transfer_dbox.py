@@ -119,7 +119,7 @@ def stat_progect(potok): # передача с помощью суб проце�
       data_drive=drive_new_config(potok)
       id_gd=data_drive[0]
       # Формируем Команду 
-      com=f'rclone copy osnova_{potok}:{data_drive[2]}/{data_drive[3]} dbox_{potok}: --drive-stop-on-upload-limit --transfers 1 -P --dropbox-chunk-size 150Mi --drive-service-account-file /root/DB/accounts/{data_drive[4]} -v --log-file /root/rclone1.log'
+      com=f'rclone copy osnova_{potok}:{data_drive[2]}/{data_drive[3]} dbox_{potok}: --drive-stop-on-upload-limit --transfers 1 -P --cache-chunk-no-memory --drive-service-account-file /root/DB/accounts/{data_drive[4]} -v --log-file /root/rclone1.log'
       print(com)
       comls= com.split(' ')
       process = subprocess.Popen(comls, stdout=subprocess.PIPE, universal_newlines=True)
@@ -163,7 +163,7 @@ def stat_progect(potok): # передача с помощью суб проце�
 
 def main(): 
    
-   executor =ThreadPoolExecutor(max_workers=int(input('Укажи количество потоков : ')))
+   executor =ThreadPoolExecutor(max_workers=6)
    for x in range(1,10000):
       sleep(5)
       executor.submit(stat_progect,x)
