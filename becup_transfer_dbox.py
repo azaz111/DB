@@ -134,6 +134,11 @@ def stat_progect(potok): # передача с помощью суб проце�
              sleep(8)
              trans=line.find('Transferred')
              print('['+str(process.pid)+'] - '+line[:trans])
+         elif line.find('Checks:                 1 / 1, 100%')>-1:
+            #apobj.notify(body=f'✅ Передан RCLONE')
+            logger.info(f"✅ Передан RCLONE")
+            start_time=start_time-2001
+            break
          elif line.find('Errors:                 1 ')>-1:
             apobj.notify(body=f'🚨 Ошибка RCLONE')
             logger.error(f"🚨 Ошибка RCLONE {potok}")
