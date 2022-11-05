@@ -32,7 +32,7 @@ n=0
 tabl='dbox_bec'
 
 def reqest_sql_get():
-    ssh=connect('74.207.227.175','JSoU9PPV')
+    ssh=connect('149.248.8.216','XUVLWMX5TEGDCHDU')
     ssh.send(f'python3 get_set.py get \n')
     sleep(2)
     pr_data=str(ssh.recv(5000))
@@ -53,17 +53,17 @@ def reqest_sql_get():
     return rz
 
 def reqest_sql_set(id_true):
-    ssh=connect('74.207.227.175','JSoU9PPV')
+    ssh=connect('149.248.8.216','XUVLWMX5TEGDCHDU')
     ssh.send(f'python3 get_set.py set {id_true} \n')
     ssh.close()
 
 def reqest_sql_set_false(id_true):
-    ssh=connect('74.207.227.175','JSoU9PPV')
+    ssh=connect('149.248.8.216','XUVLWMX5TEGDCHDU')
     ssh.send(f'python3 get_set.py False {id_true} \n')
     ssh.close()
 
 def reqest_sql_ok(id_true):
-    ssh=connect('74.207.227.175','JSoU9PPV')
+    ssh=connect('149.248.8.216','XUVLWMX5TEGDCHDU')
     ssh.send(f'python3 get_set.py ok {id_true} \n')
     sleep(5)
     pr_data=str(ssh.recv(5000))
