@@ -38,7 +38,7 @@ def reqest_sql_get():
     pr_data=str(ssh.recv(5000))
     #print(pr_data)
     try:
-       s_data=pr_data[pr_data.find(r'\r\n(')+5:pr_data.find(r')\r\n\x1b')]
+       s_data=pr_data[pr_data.find(r'\r\n(')+4:pr_data.find(r')\r\n\x1b')-15]
        try:
           s_data=re.sub(r'\\', '', s_data)
        except:
