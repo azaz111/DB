@@ -6,6 +6,7 @@ import subprocess
 import paramiko
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
+from sys import argv
 try:
    from sshtunnel import SSHTunnelForwarder
    import apprise
@@ -95,9 +96,9 @@ def stat_progect(potok): # передача с помощью суб проце�
       #print(f'[ERROR] {err}')
       
 
-def main(): 
+def main(workers): 
    
-   executor =ThreadPoolExecutor(max_workers=4)
+   executor =ThreadPoolExecutor(max_workers=workers)
    for x in range(1,10000):
       sleep(5)
       executor.submit(stat_progect,x)
@@ -108,4 +109,4 @@ if __name__ == '__main__':
       os.remove('/root/.config/rclone/rclone.conf')
    except:
       pass
-   main()
+   main(int(argv[1]))
