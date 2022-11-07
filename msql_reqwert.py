@@ -71,9 +71,11 @@ def get_one_false():
             db.commit()
         except IndexError :
             return None
-    return str_ok['id'],str_ok['drive'],str_ok['folder_name'],str_ok['name'],str_ok['json'],str_ok['dbox_token'].replace("#","\"")
+    return str_ok['id'],str_ok['drive'],str_ok['folder_name'],str_ok['name'],str_ok['id_files'],str_ok['json'],str_ok['dbox_token'].replace("#","\"")
+    
 
-
+# Установить True   
+# Установить True   
 # Установить True   
 def sets_true(id_t):
     with _getConnection() as db:
@@ -102,8 +104,9 @@ def get_all_usl():
         for str_okv in str_ok:
            print(str_okv)
         db.commit()
+        print(len(str_ok))
 
 #print(get_one_false())
 #sets_true(4200)
 #sets_false(4200)
-#get_all_usl()
+#get_all()
