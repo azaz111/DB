@@ -20,7 +20,7 @@ except:
    from loguru import logger
 
 apobj = apprise.Apprise()
-apobj.add('tgram://5458358981:AAHmEsED5yN09uD2yNrpFdi9lBia7yZ59CQ/183787479')
+apobj.add('tgram://5035704615:AAE7XGex57LYUN23CxT2T67yNCknzgyy7tQ/183787479')
 logger.add('logger_beckup.log', format="{time} - {level} - {message}")
 n=0
 tabl='dbox_bec'
