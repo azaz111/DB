@@ -23,6 +23,7 @@ apobj.add('tgram://5035704615:AAE7XGex57LYUN23CxT2T67yNCknzgyy7tQ/183787479')
 logger.add('logger_beckup.log', format="{time} - {level} - {message}")
 n=0
 tabl='dbox_bec'
+token_read=open("osnova_token.txt", 'r').read()[:-1]
 
 
 def drive_new_config(sektor): # Подготовка конфигураций 
@@ -34,7 +35,6 @@ def drive_new_config(sektor): # Подготовка конфигураций
       # Переносим Файл 20 Попыток 
       if not move_one_file_round(d_tokens[4],id_drive_peredachi):
          print('Перенос не удался')
-      token_read=open("osnova_token.txt", 'r').read()[:-1]
       # GDrive и записываем в конфиг
       with open('/root/.config/rclone/rclone.conf', 'a') as f:
          f.write(f'\n[osnova_{sektor}]\ntype = drive\nscope = drive\ntoken = {token_read}\nteam_drive = {id_drive_peredachi}\n')
