@@ -61,7 +61,7 @@ def stat_progect(potok): # передача с помощью суб проце�
       if data_drive:
          id_gd=data_drive[0]
          # Формируем Команду 
-         com=f'rclone copy osnova_{potok}:{data_drive[3]} dbox_{potok}: --drive-stop-on-upload-limit --transfers 1 -P --cache-chunk-no-memory --drive-service-account-file /root/DB/accounts/{data_drive[5]} -v --log-file /root/rclone1.log'
+         com=f'rclone copy osnova_{potok}:{data_drive[3]} dbox_{potok}: --drive-stop-on-upload-limit --dropbox-chunk-size 150Mi --transfers 1 -P --cache-chunk-no-memory --drive-service-account-file /root/DB/accounts/{data_drive[5]} -v --log-file /root/rclone1.log'
          print(com)
          comls= com.split(' ')
          process = subprocess.Popen(comls, stdout=subprocess.PIPE, universal_newlines=True)
