@@ -1,11 +1,12 @@
 from msql_reqwert import get_one_false , sets_false , sets_true
-from gdrive_respons import new_drive_and_json , move_one_file_round , delete_drive
+from gdrive_respons import new_drive_and_json , move_one_file_round , delete_drive , service_avtoriz_v3
 from sys import argv
 import os
 from time import sleep , time
 import subprocess
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
+from googleapiclient.errors import HttpError
 try:
    from sshtunnel import SSHTunnelForwarder
    import apprise
@@ -114,6 +115,10 @@ def stat_progect(potok, ip_ser): # передача с помощью суб п�
       logger.error(f"🚨[{ip_ser}] Ошибка AttributeError Удаляем диск {data_drive[-1]}")
       delete_drive(data_drive[-1])
       sets_false(id_gd)
+
+   except google.auth.exceptions.RefreshError as err: 
+      logger.error(f"🚨[{ip_ser}] Ошибка RefreshError {ip_ser}")
+      service_avtoriz_v3()
 
    
    except Exception as err: 
