@@ -1,5 +1,5 @@
 from msql_reqwert import get_one_false , sets_false , sets_true
-from gdrive_respons import new_drive_and_json , move_one_file_round , delete_drive , service_avtoriz_v3
+from gdrive_respons import new_drive_and_json , move_one_file_round , delete_drive 
 from sys import argv
 import os
 from time import sleep , time
@@ -27,7 +27,7 @@ tabl='dbox_bec'
 token_read=open("osnova_token.txt", 'r').read()[:-1]
 
 
-@logger.catch
+#@logger.catch
 def drive_new_config(sektor): # Подготовка конфигураций 
    d_tokens=get_one_false()  # Получили все данные с базы 
    if d_tokens:
@@ -53,7 +53,7 @@ def drive_new_config(sektor): # Подготовка конфигураций
       return drive_new_config(sektor)
    return d_tokens+id_drive_peredachi
 
-@logger.catch
+#@logger.catch
 def stat_progect(potok, ip_ser): # передача с помощью суб процесса
    logger.debug(f"Старт потока {potok} {ip_ser}")
    try:
@@ -115,20 +115,20 @@ def stat_progect(potok, ip_ser): # передача с помощью суб п�
       logger.error(f"🚨[{ip_ser}] Ошибка AttributeError Удаляем диск {data_drive[-1]}")
       delete_drive(data_drive[-1])
       sets_false(id_gd)
-
-   except google.auth.exceptions.RefreshError as err: 
-      logger.error(f"🚨[{ip_ser}] Ошибка RefreshError {ip_ser}")
-      service_avtoriz_v3()
-
+#
+   except IndexError : 
+      logger.error(f"[{ip_ser}]⚠️ Нет свободных фалов в базе  ")
+      apobj.notify(body=f"[{ip_ser}]⚠️ Нет свободных фалов в базе  ")
+      sleep(30)
    
    except Exception as err: 
       apobj.notify(body=f'🚨[{ip_ser}] Ошибка {err}')
       logger.error(f"🚨[{ip_ser}] Ошибка {err}")
    
-@logger.catch   
+
 def main(workers,ip_servv=''): 
    
-   executor =ThreadPoolExecutor(max_workers=workers)
+   executor =ThreadPoolExecutor(max_workers=1)
    for x in range(1,10000):
       if os.path.exists('Stop'):
          apobj.notify(body=f'🚨 Stop : ждем завершения текущих процессов ')
