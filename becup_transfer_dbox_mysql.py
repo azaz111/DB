@@ -128,7 +128,7 @@ def stat_progect(potok, ip_ser): # передача с помощью суб п�
 
 def main(workers,ip_servv=''): 
    
-   executor =ThreadPoolExecutor(max_workers=1)
+   executor =ThreadPoolExecutor(max_workers=workers)
    for x in range(1,10000):
       if os.path.exists('Stop'):
          apobj.notify(body=f'🚨 Stop : ждем завершения текущих процессов ')
