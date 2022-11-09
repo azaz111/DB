@@ -26,6 +26,7 @@ tabl='dbox_bec'
 token_read=open("osnova_token.txt", 'r').read()[:-1]
 
 
+@logger.catch
 def drive_new_config(sektor): # Подготовка конфигураций 
    d_tokens=get_one_false()  # Получили все данные с базы 
    if d_tokens:
@@ -51,8 +52,9 @@ def drive_new_config(sektor): # Подготовка конфигураций
       return drive_new_config(sektor)
    return d_tokens+id_drive_peredachi
 
-def stat_progect(potok): # передача с помощью суб процесса
-   logger.debug(f"Старт потока {potok}")
+@logger.catch
+def stat_progect(potok, ip_ser): # передача с помощью суб процесса
+   logger.debug(f"Старт потока {potok} {ip_ser}")
    try:
       some_date = datetime.now()
       start_time= time()
@@ -67,7 +69,7 @@ def stat_progect(potok): # передача с помощью суб проце�
          process = subprocess.Popen(comls, stdout=subprocess.PIPE, universal_newlines=True)
          print( str(process.pid) )
          logger.info(f'[{(process.pid)}] Start {data_drive[3]}')
-         sleep(5)
+         sleep(10)
          while True:
             line = process.stdout.readline()
             #print(line)
@@ -78,12 +80,12 @@ def stat_progect(potok): # передача с помощью суб проце�
                 print('['+str(process.pid)+'] - '+line[:trans])
             elif line.find('Checks:                 1 / 1, 100%')>-1:
                #apobj.notify(body=f'✅ Передан RCLONE')
-               logger.info(f"✅ Передан RCLONE")
+               logger.info(f"✅ Передан RCLONE {ip_ser}")
                start_time=start_time-2001
                break
             elif line.find('Errors:                 1 ')>-1:
-               apobj.notify(body=f'🚨 Ошибка RCLONE')
-               logger.error(f"🚨 Ошибка RCLONE {potok}")
+               apobj.notify(body=f'🚨 Ошибка RCLONE {ip_ser}')
+               logger.error(f"🚨 Ошибка RCLONE {ip_ser}")
                break
             elif not line:
                break
@@ -92,7 +94,7 @@ def stat_progect(potok): # передача с помощью суб проце�
          logger.info(f'[{(process.pid)}] Время выполнения {timedelta(seconds=a.seconds)} PEREDAN : {data_drive[3]}')
          #reqest_sql_ok(data_drive[3])
          if time() - start_time > 2000:
-            apobj.notify(body=f'✅ Передан 🕰️ Время выполнения {timedelta(seconds=a.seconds)}')
+            apobj.notify(body=f'✅ Передан 🕰️ Время выполнения {timedelta(seconds=a.seconds)} {ip_ser}')
             sets_true(id_gd)
             if move_one_file_round(data_drive[4],data_drive[1]):
                delete_drive(data_drive[-1])
@@ -101,13 +103,25 @@ def stat_progect(potok): # передача с помощью суб проце�
             print("Быстрый выход вернем False")
             if move_one_file_round(data_drive[4],data_drive[1]):
                delete_drive(data_drive[-1])
-            
 
-   except Exception as err: 
-      apobj.notify(body=f'🚨 Ошибка {err}')
-      logger.error(f"🚨 Ошибка {err}")
+   except TimeoutError as err: 
+      apobj.notify(body=f'🚨[{ip_ser}] Ошибка {err} ')
+      logger.error(f"🚨[{ip_ser}] Ошибка {err}")
+      if move_one_file_round(data_drive[4],data_drive[1]):
+         delete_drive(data_drive[-1])
+         
+   except AttributeError as err: 
+      logger.error(f"🚨[{ip_ser}] Ошибка AttributeError Удаляем диск {data_drive[-1]}")
+      delete_drive(data_drive[-1])
+      sets_false(id_gd)
+
    
-def main(workers): 
+   except Exception as err: 
+      apobj.notify(body=f'🚨[{ip_ser}] Ошибка {err}')
+      logger.error(f"🚨[{ip_ser}] Ошибка {err}")
+   
+@logger.catch   
+def main(workers,ip_servv=''): 
    
    executor =ThreadPoolExecutor(max_workers=workers)
    for x in range(1,10000):
@@ -115,11 +129,14 @@ def main(workers):
          apobj.notify(body=f'🚨 Stop : ждем завершения текущих процессов ')
          break
       sleep(5)
-      executor.submit(stat_progect,x)
+      executor.submit(stat_progect,x,ip_servv)
 
 if __name__ == '__main__':
    try:
       os.remove('/root/.config/rclone/rclone.conf')
    except:
       pass
-   main(int(argv[1]))
+   if len(argv) == 3:
+      main(int(argv[1]), argv[2])
+   else:
+      main(int(argv[1]))
