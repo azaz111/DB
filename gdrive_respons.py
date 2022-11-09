@@ -11,8 +11,7 @@ def service_avtoriz_v3(token='token.json'):# АВТОРИЗАЦИЯ  Drive API v
     SCOPES = [
     'https://www.googleapis.com/auth/drive',
     'https://www.googleapis.com/auth/cloud-platform',
-    'https://www.googleapis.com/auth/iam',
-    'https://www.googleapis.com/auth/cloudplatformprojects'
+    'https://www.googleapis.com/auth/iam'
     ]
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
