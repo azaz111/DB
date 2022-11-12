@@ -1,5 +1,5 @@
-from msql_reqwert import get_one_false , sets_false , sets_true , get_one_false2 , add_stat , sets_stat
-from gdrive_respons import new_drive_and_json , move_list_file_round , delete_drive 
+from msql_reqwert import  get_one_false2 , add_stat , sets_stat , service_avtoriz_v3
+from gdrive_respons import *
 from sys import argv
 import os
 from time import sleep , time
@@ -7,6 +7,7 @@ import subprocess
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 from googleapiclient.errors import HttpError
+from google.auth.exceptions import RefreshError
 try:
    from sshtunnel import SSHTunnelForwarder
    import apprise
@@ -26,6 +27,18 @@ n=0
 tabl='dbox_bec'
 token_read=open("osnova_token.txt", 'r').read()[:-1]
 
+#@logger.catch
+def ls_dbox(sektor):
+   full_plot=[]
+   com=f'rclone ls dbox_{sektor}:'
+   comls= com.split(' ')
+   process = subprocess.Popen(comls, stdout=subprocess.PIPE)
+   process.wait()
+   plots=process.communicate()[0].decode('utf-8').split('\n')[:-1]
+   for x in plots:
+      full_plot.append(x[13:])
+   return full_plot
+   
 
 #@logger.catch
 def drive_new_config(sektor): # Подготовка конфигураций 
@@ -50,10 +63,12 @@ def drive_new_config(sektor): # Подготовка конфигураций
       # dropbox и записываем в конфиг
       with open('/root/.config/rclone/rclone.conf', 'a') as f:
         f.write(f'\n[dbox_{sektor}]\ntype = dropbox\ntoken = {d_tokens[6]}\n')
-
+      ls_dboxs=ls_dbox(sektor)
+      list3=list(set(d_tokens[3])-set(ls_dboxs)) 
+      logger.debug(f"Задание: {len(d_tokens[3])} | Ls dbox : {len(ls_dboxs)} | Передать {len(list3)}")
       # Список имен для передачи
       with open('f.txt', 'w') as f:
-        f.write(f'\n'.join(d_tokens[3]))
+         f.write(f'\n'.join(list3))
 
       id_drive_peredachi=(id_drive_peredachi,)
    else:
@@ -65,6 +80,14 @@ def drive_new_config(sektor): # Подготовка конфигураций
 
 #@logger.catch
 def stat_progect(potok, ip_ser , work ): # передача с помощью суб процесса
+   try:
+      service=service_avtoriz_v3()
+   except RefreshError : 
+      logger.error(f"НЕВАЛИДНЫЙ ТОКЕН {potok} {ip_ser}")
+      apobj.notify(body=f"[{ip_ser}]⚠️ НЕВАЛИДНЫЙ ТОКЕН ")
+      sleep(25)
+      return stat_progect(potok, ip_ser , work )
+
    logger.debug(f"Старт потока {potok} {ip_ser}")
    add_stat(ip_ser,'')
    try:
