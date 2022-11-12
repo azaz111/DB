@@ -1,4 +1,4 @@
-from msql_reqwert import  get_one_false2 , add_stat , sets_stat , service_avtoriz_v3
+from msql_reqwert import  get_one_false2 , add_stat , sets_stat 
 from gdrive_respons import *
 from sys import argv
 import os
