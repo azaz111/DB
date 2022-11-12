@@ -36,7 +36,7 @@ def create_table_stat():
         cursor = db.cursor()
         cursor.execute(f"""CREATE TABLE IF NOT EXISTS {tabl3} (
                                     id int PRIMARY KEY AUTO_INCREMENT,
-                                    ip_a TEXT DEFAULT ("None"),
+                                    ip_a VARCHAR(40) NOT NULL UNIQUE,
                                     data TEXT DEFAULT ("None"))""")
 
 
@@ -68,7 +68,7 @@ def add(drive,folder_name,name,files,json,dbox_token:str):
 def add_stat(ip_a,data:str):
     with _getConnection() as db:
         cursor = db.cursor()
-        cursor.execute(f"""INSERT INTO {tabl3} (ip_a,data) VALUES 
+        cursor.execute(f"""INSERT IGNORE INTO {tabl3} (ip_a,data) VALUES 
                                                ("{ip_a}","{data}")""")
         db.commit()
 
@@ -157,8 +157,8 @@ def get_all_usl():
         print(len(cursor.fetchall()), ' - False')
         cursor.execute( f'SELECT * FROM {tabl} WHERE status = "True"' ) # запросим все данные  
         print(len(cursor.fetchall()), ' - True')
-        cursor.execute( f'SELECT * FROM {tabl} WHERE status = "OK"' ) # запросим все данные  
-        print(len(cursor.fetchall()), ' - OK')
+        cursor.execute( f'SELECT * FROM {tabl} WHERE status = "Error"' ) # запросим все данные  
+        print(len(cursor.fetchall()), ' - Error')
 
         #str_ok = cursor.fetchall()
         #for str_okv in str_ok:
@@ -226,3 +226,5 @@ def get_one_false2():
 #get_all2()
 
 # INSERT INTO token_db dbox_token SELECT DISTINCT dbox_token FROM dbox_bec;
+#get_all_usl()
+#create_table_stat()
