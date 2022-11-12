@@ -176,7 +176,6 @@ def get_all_usl():
 def get_all_token(id_t):
     with _getConnection() as db:
         dbox_token = id_t.replace("\"","#")[185:-50]
-        #dbox_token = '{#access_token#:#sl.BRKQrcOeGs8crDdkP_WJVrFohfxgMPASBB4gj3jSOBBnE9mKTIMsqIQRPg4TYz_FBjINEMjn6il0DLcNPsw3JJ_3Ad2tIlNzTEo8DoLUM-S88uvtk2tALTQR8NXwdlwsr_k2KHsT#,#token_type#:#bearer#,#refresh_token#:#XX9NY4QFV2wAAAAAAAAAAV5YeIcdpVT3V-HfD4XT3qYrXBrPf10NS_0_dChY6VOt#,#expiry#:#2022-10-15T16:24:44.6999644+03:00#}'
         print(dbox_token)
         cursor = db.cursor()
         #cursor.execute( r"SELECT * FROM dbox_bec WHERE dbox_token LIKE '%access_token#:#sl.BRKQrcOeGs8crDdkP_WJVrFohfxgMPASBB4gj3jSOBBnE9mKTIMsqIQRPg4TYz_FBjINEMjn6il0%' " ) # запросим все данные  
@@ -195,8 +194,11 @@ def get_all_token1():
         cursor.execute( f"SELECT DISTINCT dbox_token FROM dbox_bec " )
         #cursor.execute( "SELECT * FROM %s WHERE dbox_token = '%s'" % (tabl,dbox_token)) # запросим все данные  # запросим все данные  
         str_ok = cursor.fetchall()
+        #print(str_ok)
+        #input('next //// ')
         for str_okv in str_ok:
            print(str_okv)
+           cursor.execute('INSERT INTO token_db (dbox_token) VALUES ("%s")' % str_okv['dbox_token'])
         db.commit()
 
 def get_one_false2():
@@ -205,8 +207,6 @@ def get_one_false2():
             cursor = db.cursor()
             cursor.execute(f'SELECT * FROM {tabl} WHERE dbox_token = (SELECT dbox_token FROM token_db WHERE status = "False" LIMIT 1) and status = "False" ') 
             str_ok = cursor.fetchall()
-            db.commit()
-        
             #print(str_ok)
             name_list=[x['name'] for x in str_ok]
             id_list=[x['id_files'] for x in str_ok]
@@ -220,8 +220,9 @@ def get_one_false2():
 
 
 #get_all_token1()
+#print(get_one_false2())
 #create_table2()
-
+#get_all_token1()
 #print(get_one_false2())
 #get_all2()
 
