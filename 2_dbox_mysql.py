@@ -65,7 +65,7 @@ def drive_new_config(sektor): # Подготовка конфигураций
         f.write(f'\n[dbox_{sektor}]\ntype = dropbox\ntoken = {d_tokens[6]}\n')
       ls_dboxs=ls_dbox(sektor)
       list3=list(set(d_tokens[3])-set(ls_dboxs)) 
-      logger.debug(f"Задание: {len(d_tokens[3])} | Ls dbox : {len(ls_dboxs)} | Передать {len(list3)}")
+      logger.debug(f"Задание: {len(d_tokens[3])} | id_Token : {d_tokens[0]} | Ls dbox : {len(ls_dboxs)} | Передать {len(list3)}")
       # Список имен для передачи
       with open('f.txt', 'w') as f:
          f.write(f'\n'.join(list3))
