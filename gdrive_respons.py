@@ -8,11 +8,10 @@ import os
 from random import randint
 from json import loads
 
-SCOPES = ["https://www.googleapis.com/auth/drive",
-          "https://www.googleapis.com/auth/cloud-platform",
-          "https://www.googleapis.com/auth/iam"]
-
 def service_avtoriz_v3(token='token.json'):# АВТОРИЗАЦИЯ  Drive API v3  
+    SCOPES = ["https://www.googleapis.com/auth/drive",
+              "https://www.googleapis.com/auth/cloud-platform",
+              "https://www.googleapis.com/auth/iam"]
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -24,8 +23,7 @@ def service_avtoriz_v3(token='token.json'):# АВТОРИЗАЦИЯ  Drive API v
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
+            flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
         with open('token.json', 'w') as token:
@@ -34,7 +32,9 @@ def service_avtoriz_v3(token='token.json'):# АВТОРИЗАЦИЯ  Drive API v
     service = build('drive', 'v3', credentials=creds)
     return service
 
-def new_drive_and_json( name:str , json:str , service=service_avtoriz_v3()): # Создаем новый диск подключаем джисоны вход : желаемое имя  выход data drive
+
+def new_drive_and_json( name:str , json:str ): # Создаем новый диск подключаем джисоны вход : желаемое имя  выход data drive
+    service=service_avtoriz_v3()
     new_grive=None
     email=loads(open(json, 'r').read())['client_email']
     for x in range(5):
@@ -56,7 +56,9 @@ def new_drive_and_json( name:str , json:str , service=service_avtoriz_v3()): # �
             print(f'[ERROR Create Drive] {err}' )
             time.sleep(2)
 
-def move_one_file_round(new_file_l,id_foldnazna,service=service_avtoriz_v3()):  # Перенос  файла в указанную папрку или диск вход : Список айди которые нужно перенести и айди родителя     
+
+def move_one_file_round(new_file_l,id_foldnazna):  # Перенос  файла в указанную папрку или диск вход : Список айди которые нужно перенести и айди родителя   
+    service=service_avtoriz_v3()  
     file=None
     for x in range(20):
         try:
@@ -74,7 +76,9 @@ def move_one_file_round(new_file_l,id_foldnazna,service=service_avtoriz_v3()):  
             time.sleep(2)
     return False
 
-def move_list_file_round(new_file_l,id_foldnazna,service=service_avtoriz_v3()):  # Перенос  файла в указанную папрку или диск вход : Список айди которые нужно перенести и айди родителя     
+
+def move_list_file_round(new_file_l,id_foldnazna):  # Перенос  файла в указанную папрку или диск вход : Список айди которые нужно перенести и айди родителя     
+    service=service_avtoriz_v3()
     try:
         for new_file in new_file_l:
             file = service.files().get(fileId=new_file, supportsAllDrives=True, fields='parents').execute()
@@ -90,7 +94,9 @@ def move_list_file_round(new_file_l,id_foldnazna,service=service_avtoriz_v3()): 
         time.sleep(2)
         return False
 
-def delete_drive(s_iddrive,service=service_avtoriz_v3()):  # Перенос  файла в указанную папрку или диск вход : Список айди которые нужно перенести и айди родителя     
+
+def delete_drive(s_iddrive):  # Перенос  файла в указанную папрку или диск вход : Список айди которые нужно перенести и айди родителя     
+    service=service_avtoriz_v3()
     for x in range(5):
         try:
             service.drives().delete(driveId=s_iddrive).execute()
