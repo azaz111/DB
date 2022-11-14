@@ -9,7 +9,10 @@ from datetime import datetime, timedelta
 from googleapiclient.errors import HttpError
 from google.auth.exceptions import RefreshError
 from requests import get
-ip_address = get('https://ipapi.co/ip/').text
+try:
+   ip_address = getget('http://ipinfo.io/json').json()['ip']
+except:
+   ip_address="NONE"
 try:
    from sshtunnel import SSHTunnelForwarder
    import apprise
