@@ -8,9 +8,9 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 from googleapiclient.errors import HttpError
 from google.auth.exceptions import RefreshError
-import socket
-hostname = socket.gethostname()
-ip_address = socket.gethostbyname(hostname)
+from requests import get
+ip = get('https://ipapi.co/ip/').text
+print(ip)
 try:
    from sshtunnel import SSHTunnelForwarder
    import apprise
