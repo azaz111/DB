@@ -1,4 +1,4 @@
-from msql_reqwert import  get_one_false2 , add_stat , sets_stat 
+from msql_reqwert import  get_one_false2 , add_stat , sets_stat , sets_false_token
 from gdrive_respons import *
 from sys import argv
 import os
@@ -42,9 +42,23 @@ def ls_dbox(sektor):
 
 #@logger.catch
 def drive_new_config(sektor): # Подготовка конфигураций 
-   d_tokens=get_one_false2()  # Получили все данные с базы 
+   d_tokens=get_one_false2()  # Получили все данные с базы
+
    if d_tokens:
-      print(d_tokens) 
+      print(d_tokens)
+      try:
+         service=service_avtoriz_v3()
+         service.files().get(fileId=d_tokens[1], supportsAllDrives=True, fields='id').execute()
+      except HttpError : 
+         apobj.notify(body=f'🚨[Забанен исходник !!! Возвращаю False') 
+         logger.warning(f' Забанен исходник !!! Возвращаю False ')   
+         sets_false_token(d_tokens[6])
+         sleep(30)
+         return
+
+
+
+
       while True:
          # Создаем диск для переноса  и Вяжем джисон  
          id_drive_peredachi=new_drive_and_json(sektor,f'accounts/{d_tokens[5]}')
