@@ -10,7 +10,7 @@ from googleapiclient.errors import HttpError
 from google.auth.exceptions import RefreshError
 from requests import get
 try:
-   ip_address = getget('http://ipinfo.io/json').json()['ip']
+   ip_address = get('http://ipinfo.io/json').json()['ip']
 except:
    ip_address="NONE"
 try:
