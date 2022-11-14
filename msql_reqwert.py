@@ -65,6 +65,7 @@ def add(drive,folder_name,name,files,json,dbox_token:str):
                                              ("{drive}","{folder_name}","{name}","{files}","{json}","{dbox_token}")""")
         db.commit()
 
+
 def add_stat(ip_a,data:str):
     with _getConnection() as db:
         cursor = db.cursor()
@@ -80,6 +81,7 @@ def sets_stat(ip_a,data:str):
         db.commit()
         print("OK")
         
+
 # Получить все данные 
 def get_all():
     with _getConnection() as db:
@@ -90,6 +92,7 @@ def get_all():
         for str_okv in str_ok:
            print(str_okv)
         db.commit()
+
 
 def get_all2():
     with _getConnection() as db:
@@ -118,9 +121,7 @@ def get_one_false():
             return None
     return str_ok['id'],str_ok['drive'],str_ok['folder_name'],str_ok['name'],str_ok['id_files'],str_ok['json'],str_ok['dbox_token'].replace("#","\"")
     
-
-# Установить True   
-# Установить True   
+ 
 # Установить True   
 def sets_true(id_t):
     with _getConnection() as db:
@@ -134,15 +135,17 @@ def sets_true(id_t):
 def sets_false(id_t):
     with _getConnection() as db:
         cursor = db.cursor()
-        cursor.execute('UPDATE %s SET status = "%s" WHERE id = %s' %(tabl,"False",id_t))
+        cursor.execute('UPDATE %s SET status = "%s" WHERE id = %s' %(tabl2,"False",id_t))
         db.commit()
         print("OK")  
 
-# Установить False        
-def sets_false(id_t):
+
+# Установить False  Для токена       
+def sets_false_token(id_t):
+    dbox_token = id_t.replace("\"","#")[185:-50]
     with _getConnection() as db:
         cursor = db.cursor()
-        cursor.execute('UPDATE %s SET status = "%s" WHERE id = %s' %(tabl,"False",id_t))
+        cursor.execute(f"UPDATE {tabl2} SET status = 'False' WHERE dbox_token LIKE '%{dbox_token}%'")
         db.commit()
         print("OK")  
 
@@ -229,3 +232,4 @@ def get_one_false2():
 # INSERT INTO token_db dbox_token SELECT DISTINCT dbox_token FROM dbox_bec;
 #get_all_usl()
 #create_table_stat()
+#sets_false(input(' : '))
