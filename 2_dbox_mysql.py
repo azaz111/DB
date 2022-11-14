@@ -8,6 +8,9 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 from googleapiclient.errors import HttpError
 from google.auth.exceptions import RefreshError
+import socket
+hostname = socket.gethostname()
+ip_address = socket.gethostbyname(hostname)
 try:
    from sshtunnel import SSHTunnelForwarder
    import apprise
@@ -177,4 +180,4 @@ if __name__ == '__main__':
    if len(argv) == 3:
       main(int(argv[1]), argv[2])
    else:
-      main(int(argv[1]))
+      main(int(argv[1]),ip_address)
