@@ -52,12 +52,9 @@ def drive_new_config(sektor): # Подготовка конфигураций
       except HttpError : 
          apobj.notify(body=f'🚨[Забанен исходник !!! Возвращаю False') 
          logger.warning(f' Забанен исходник !!! Возвращаю False ')   
-         sets_false_token(d_tokens[6])
          sleep(30)
+         sets_false_token(d_tokens[6])
          return
-
-
-
 
       while True:
          # Создаем диск для переноса  и Вяжем джисон  
