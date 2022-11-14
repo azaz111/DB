@@ -89,8 +89,9 @@ def drive_new_config(sektor): # Подготовка конфигураций
       id_drive_peredachi=(id_drive_peredachi,)
    else:
       print(" Нет доступных фалов или доступа к базе ")
-      logger.error(f"🚨 Нет доступных фалов или доступа к базе 'drive' ")
-      sleep(20)
+      logger.error(f"🚨 Нет доступных фалов или доступа к базе  ")
+      apobj.notify(body=f"[{ip_ser}]⚠️🚨 Нет доступных фалов или доступа к базе ")
+      sleep(120)
       return drive_new_config(sektor)
    return d_tokens+id_drive_peredachi
 
