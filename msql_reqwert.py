@@ -208,13 +208,18 @@ def get_one_false2():
     with _getConnection() as db:
         try:
             cursor = db.cursor()
-            cursor.execute(f'SELECT * FROM {tabl} WHERE dbox_token = (SELECT dbox_token FROM token_db WHERE status = "False" LIMIT 1) and status = "False" ') 
+            cursor.execute(f'SELECT dbox_token FROM {tabl2} WHERE status = "False" LIMIT 1')
+            find_t=cursor.fetchall()[0]['dbox_token']
+            print(find_t)
+            cursor.execute(f'SELECT * FROM {tabl} WHERE dbox_token = "{find_t}" and status = "False" ') 
             str_ok = cursor.fetchall()
-            #print(str_ok)
+            if len(str_ok)==0: 
+               print('Нет фалов')
+               cursor.execute(f'UPDATE {tabl2} SET status = "OK" WHERE dbox_token = "{find_t}" ')
+               db.commit()
+               return None
             name_list=[x['name'] for x in str_ok]
             id_list=[x['id_files'] for x in str_ok]
-            #print(name_list)
-            #print(id_list)
             cursor.execute(f'UPDATE {tabl2} SET status = "Work" WHERE dbox_token = "{str_ok[0]["dbox_token"]}"')
             db.commit()
         except IndexError :
