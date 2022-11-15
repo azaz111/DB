@@ -61,26 +61,38 @@ def drive_new_config(sektor): # Подготовка конфигураций
          sets_false_token(d_tokens[6])
          return
 
+
+      
+
+      # dropbox и записываем в конфиг
+      with open('/root/.config/rclone/rclone.conf', 'a') as f:
+        f.write(f'\n[dbox_{sektor}]\ntype = dropbox\ntoken = {d_tokens[6]}\n')
+      ls_dboxs=ls_dbox(sektor)
+
+
+      list3=list(set(d_tokens[3])-set(ls_dboxs)) 
+
+      list_transfer=[]
+      for x in range(len(d_tokens[3])):
+         if d_tokens[3][x] in list3:
+            list_transfer.append(d_tokens[4][x])
+      logger.info(f'Перенос файлов {len(list_transfer)} шт.')
       while True:
          # Создаем диск для переноса  и Вяжем джисон  
          id_drive_peredachi=new_drive_and_json(sektor,f'accounts/{d_tokens[5]}')
          # Переносим Файл 20 Попыток 
-         if not move_list_file_round(d_tokens[4],id_drive_peredachi):
+         if not move_list_file_round(list_transfer,id_drive_peredachi):
             print('Перенос не удался')
             delete_drive(id_drive_peredachi)
          else:
             print('Файлы успешно перенесены id:',id_drive_peredachi)
             break
-      
+
       # GDrive и записываем в конфиг
       with open('/root/.config/rclone/rclone.conf', 'a') as f:
          f.write(f'\n[osnova_{sektor}]\ntype = drive\nscope = drive\ntoken = {token_read}\nteam_drive = {id_drive_peredachi}\n')
       sleep(2)
-      # dropbox и записываем в конфиг
-      with open('/root/.config/rclone/rclone.conf', 'a') as f:
-        f.write(f'\n[dbox_{sektor}]\ntype = dropbox\ntoken = {d_tokens[6]}\n')
-      ls_dboxs=ls_dbox(sektor)
-      list3=list(set(d_tokens[3])-set(ls_dboxs)) 
+
       logger.debug(f"Задание: {len(d_tokens[3])} | id_Token : {d_tokens[0]} | Ls dbox : {len(ls_dboxs)} | Передать {len(list3)}")
       # Список имен для передачи
       with open('f.txt', 'w') as f:
