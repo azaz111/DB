@@ -65,7 +65,14 @@ def add(drive,folder_name,name,files,json,dbox_token:str):
                                              ("{drive}","{folder_name}","{name}","{files}","{json}","{dbox_token}")""")
         db.commit()
 
-
+# Добавим оптом значения в базу !
+def add_opt(dop_bazu:list):
+    #drive,folder_name,name,files,json,dbox_token
+    with _getConnection() as db:
+        cursor = db.cursor()
+        cursor.executemany(f"""INSERT INTO {tabl} (drive,folder_name,name,id_files,json,`dbox_token`) VALUES (%s,%s,%s,%s,%s,%s) """ , dop_bazu)
+        db.commit()
+        
 def add_stat(ip_a,data:str):
     with _getConnection() as db:
         cursor = db.cursor()
