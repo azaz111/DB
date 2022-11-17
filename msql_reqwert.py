@@ -31,6 +31,7 @@ def create_table2():
                                     dbox_token TEXT ,
                                     status TEXT DEFAULT ("False") )""")
 
+
 def create_table_stat():
     with _getConnection() as db:
         cursor = db.cursor()
@@ -38,8 +39,6 @@ def create_table_stat():
                                     id int PRIMARY KEY AUTO_INCREMENT,
                                     ip_a VARCHAR(40) NOT NULL UNIQUE,
                                     data TEXT DEFAULT ("None"))""")
-
-
 
 # Cоздаем базу данных ! 
 def create_table():
@@ -54,7 +53,6 @@ def create_table():
                                     json TEXT  ,
                                     dbox_token TEXT ,
                                     status TEXT DEFAULT ("False") )""")
-
 
 # Добавим значения в базу !
 def add(drive,folder_name,name,files,json,dbox_token:str):
@@ -72,7 +70,8 @@ def add_opt(dop_bazu:list):
         cursor = db.cursor()
         cursor.executemany(f"""INSERT INTO {tabl} (drive,folder_name,name,id_files,json,`dbox_token`) VALUES (%s,%s,%s,%s,%s,%s) """ , dop_bazu)
         db.commit()
-        
+
+
 def add_stat(ip_a,data:str):
     with _getConnection() as db:
         cursor = db.cursor()
@@ -134,6 +133,14 @@ def sets_true(id_t):
     with _getConnection() as db:
         cursor = db.cursor()
         cursor.execute('UPDATE %s SET status = "%s" WHERE id = %s' %(tabl,"True",id_t,))
+        db.commit()
+        print("OK")
+
+# Установить OK   
+def sets_ok(id_t):
+    with _getConnection() as db:
+        cursor = db.cursor()
+        cursor.execute('UPDATE %s SET status = "%s" WHERE name = %s' %(tabl,"OK",id_t,))
         db.commit()
         print("OK")
 
