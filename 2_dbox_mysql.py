@@ -1,4 +1,4 @@
-from msql_reqwert import  get_one_false2 , add_stat , sets_stat , sets_false_token
+from msql_reqwert import  get_one_false2 , add_stat , sets_stat , sets_false_token , sets_ok
 from gdrive_respons import *
 from sys import argv
 import os
@@ -47,6 +47,7 @@ def ls_dbox(sektor):
 
 #@logger.catch
 def drive_new_config(sektor): # Подготовка конфигураций 
+   global list_transfer
    d_tokens=get_one_false2()  # Получили все данные с базы
 
    if d_tokens:
@@ -166,7 +167,18 @@ def stat_progect(potok, ip_ser , work ): # передача с помощью с
          logger.info(f'[{(process.pid)}] Время выполнения {timedelta(seconds=a.seconds)} PEREDAN : {data_drive[3]}')
          #reqest_sql_ok(data_drive[3])
          if time() - start_time > 2000:
-            apobj.notify(body=f'✅ Передан 🕰️ Время выполнения {timedelta(seconds=a.seconds)} {ip_ser}')
+            # Повторно считаем файлы на дропбоксе
+            pov_dbox=ls_dbox(potok)
+            for x in pov_dbox:
+               sets_ok(x)
+            # Переносим обратно
+            if not move_list_file_round(list_transfer,data_drive[1]):
+               print('Перенос обратно не удался')
+            # Возврашаем фалс токену
+            sets_false_token(data_drive[6])
+            peredan=[x for x in list_transfer if x in pov_dbox]
+            apobj.notify(body=f'[{ip_ser}]✅ Передан 🕰️ Время: {timedelta(seconds=a.seconds)} Передано {len(peredan)}/{len(list_transfer)}')
+
 
    except IndexError : 
       logger.error(f"[{ip_ser}]⚠️ Нет свободных фалов в базе  ")
