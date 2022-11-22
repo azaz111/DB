@@ -1,4 +1,4 @@
-from msql_reqwert import  get_one_false2 , add_stat , sets_stat , sets_false_token , sets_ok
+from msql_reqwert import  get_one_false2 , sets_stat , sets_false_token , sets_ok
 from gdrive_respons import *
 from sys import argv
 import os
