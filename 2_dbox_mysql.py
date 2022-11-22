@@ -119,7 +119,6 @@ def stat_progect(potok, ip_ser , work ): # передача с помощью с
       return stat_progect(potok, ip_ser , work )
 
    logger.debug(f"Старт потока {potok} {ip_ser}")
-   add_stat(ip_ser,'')
    try:
       some_date = datetime.now()
       start_time= time()
@@ -157,8 +156,8 @@ def stat_progect(potok, ip_ser , work ): # передача с помощью с
              x+=1
              if x == 400:
                  now = datetime.now() + timedelta(minutes=480)
-                 sets_stat(ip_ser,f'data {now.strftime("%d-%m-%Y %H:%M")} | Work : {tr} | peredano : {pr} | time_wok {ti} | oshibka {er}')
-                 print(ip_ser,f'data {now.strftime("%d-%m-%Y %H:%M")} | Work : {tr} | peredano : {pr} | time_wok {ti} | oshibka {er}')
+                 sets_stat(ip_ser, id_gd ,int(time()), f' Work : {tr} | peredano : {pr} | time_wok {ti}')
+                 print(ip_ser,f'data {now.strftime("%d-%m-%Y %H:%M")} | Work : {tr} | peredano : {pr} | time_wok {ti}')
                  x=0
              elif er!='None':
                  break
