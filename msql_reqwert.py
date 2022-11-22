@@ -38,6 +38,8 @@ def create_table_stat():
         cursor.execute(f"""CREATE TABLE IF NOT EXISTS {tabl3} (
                                     id int PRIMARY KEY AUTO_INCREMENT,
                                     ip_a VARCHAR(40) NOT NULL UNIQUE,
+                                    id_token_wokr INT DEFAULT 0,
+                                    time_update INT DEFAULT 0,
                                     data TEXT DEFAULT ("None"))""")
 
 # Cоздаем базу данных ! 
@@ -72,18 +74,16 @@ def add_opt(dop_bazu:list):
         db.commit()
 
 
-def add_stat(ip_a,data:str):
+
+#(ip_ser, id_gd ,int(time()), f' Work
+# Установить значение 
+def sets_stat(ip_a,id_token,time_update,data:str):
     with _getConnection() as db:
         cursor = db.cursor()
-        cursor.execute(f"""INSERT IGNORE INTO {tabl3} (ip_a,data) VALUES 
-                                               ("{ip_a}","{data}")""")
-        db.commit()
-
-
-def sets_stat(ip_a,data:str):
-    with _getConnection() as db:
-        cursor = db.cursor()
-        cursor.execute('UPDATE %s SET data = "%s" WHERE ip_a = "%s"' %(tabl3,data,ip_a,))
+        #cursor.execute('UPDATE %s SET data = "%s" WHERE ip_a = "%s"' %(tabl3,data,ip_a,))
+        cursor.execute(f"""INSERT INTO {tabl3} (ip_a,id_token_wokr,time_update,data) 
+                                               VALUES ("{ip_a}",{id_token},{time_update},"{data}")
+                                               ON DUPLICATE KEY UPDATE id_token_wokr={id_token},time_update={time_update},data="{data}" """ )
         db.commit()
         print("OK")
         
@@ -240,7 +240,8 @@ def get_one_false2():
             return None
     return str_ok[0]['id'],str_ok[0]['drive'],str_ok[0]['folder_name'],name_list,id_list,str_ok[0]['json'],str_ok[0]['dbox_token'].replace("#","\"")
 
-
+create_table_stat()
+sets_stat(121225,452,452542,'gffgdfg')
 #get_all_token1()
 #print(get_one_false2())
 #create_table2()
