@@ -168,13 +168,16 @@ def stat_progect(potok, ip_ser , work ): # передача с помощью с
          #reqest_sql_ok(data_drive[3])
          if time() - start_time > 2000:
             # Повторно считаем файлы на дропбоксе
+            logger.info(f' Пересчет файлов на дропбоксе ') 
             pov_dbox=ls_dbox(potok)
             for x in pov_dbox:
                sets_ok(x)
             # Переносим обратно
+            logger.info(f' Возвращаем файлы в плот : {len(list_transfer)} шт') 
             if not move_list_file_round(list_transfer,data_drive[1]):
                print('Перенос обратно не удался')
             # Возврашаем фалс токену
+            logger.info(f' Возвращаем фалс токену ')
             sets_false_token(data_drive[6])
             peredan=[x for x in list_transfer if x in pov_dbox]
             apobj.notify(body=f'[{ip_ser}]✅ Передан 🕰️ Время: {timedelta(seconds=a.seconds)} Передано {len(peredan)}/{len(list_transfer)}')
