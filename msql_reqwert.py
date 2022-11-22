@@ -140,7 +140,7 @@ def sets_true(id_t):
 def sets_ok(id_t):
     with _getConnection() as db:
         cursor = db.cursor()
-        cursor.execute('UPDATE %s SET status = "%s" WHERE name = %s' %(tabl,"OK",id_t,))
+        cursor.execute('UPDATE %s SET status = "%s" WHERE name = "%s"' %(tabl,"OK",id_t,))
         db.commit()
         print("OK")
 
