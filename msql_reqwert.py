@@ -241,7 +241,7 @@ def get_one_false2():
     return str_ok[0]['id'],str_ok[0]['drive'],str_ok[0]['folder_name'],name_list,id_list,str_ok[0]['json'],str_ok[0]['dbox_token'].replace("#","\"")
 
 create_table_stat()
-sets_stat(121225,452,452542,'gffgdfg')
+#sets_stat(121225,452,452542,'gffgdfg')
 #get_all_token1()
 #print(get_one_false2())
 #create_table2()
