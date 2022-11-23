@@ -147,9 +147,6 @@ def stat_progect(potok, ip_ser , work ): # передача с помощью с
                 pr=line.split('Transferred')[1][12:-2]
              elif line.find('Elapsed time:')>-1:
                 ti=line[10:-2]
-             if line.find('Errors:')>-1:
-                print('ОШИБКА')
-                er='True'
              elif not line:
                 print('Завершено')
                 er='OK'
@@ -174,22 +171,18 @@ def stat_progect(potok, ip_ser , work ): # передача с помощью с
             # Переносим обратно
             logger.info(f' Возвращаем файлы в плот : {len(list_transfer)} шт') 
             if not move_list_file_round(list_transfer,data_drive[1]):
-               print('Перенос обратно не удался')
+               logger.debug('Перенос обратно не удался')
             # Возврашаем фалс токену
             logger.info(f' Возвращаем фалс токену ')
             sets_false_token(data_drive[6])
-            peredan=[x for x in list_transfer if x in pov_dbox]
-            apobj.notify(body=f'[{ip_ser}]✅ Передан 🕰️ Время: {timedelta(seconds=a.seconds)} Передано {len(peredan)}/{len(list_transfer)}')
+            peredan=[x for x in data_drive[3] if x in pov_dbox]
+            apobj.notify(body=f'[{ip_ser}]✅ Передан 🕰️ Время: {timedelta(seconds=a.seconds)} Передано {len(peredan)}/{len(data_drive[3])}')
 
-
-   except IndexError : 
-      logger.error(f"[{ip_ser}]⚠️ Нет свободных фалов в базе  ")
-      apobj.notify(body=f"[{ip_ser}]⚠️ Нет свободных фалов в базе  ")
-      sleep(30)
-   
    except Exception as err: 
       apobj.notify(body=f'🚨[{ip_ser}] Ошибка {err}')
       logger.error(f"🚨[{ip_ser}] Ошибка {err}")
+      if data_drive[6]:
+         sets_false_token(data_drive[6])
    
 
 def main(workers,ip_servv=''): 
