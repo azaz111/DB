@@ -222,8 +222,10 @@ def get_one_false2():
     with _getConnection() as db:
         try:
             cursor = db.cursor()
-            cursor.execute(f'SELECT dbox_token FROM {tabl2} WHERE status = "False" LIMIT 1')
-            find_t=cursor.fetchall()[0]['dbox_token']
+            cursor.execute(f'SELECT dbox_token,id FROM {tabl2} WHERE status = "False" LIMIT 1')
+            find_all=cursor.fetchall()
+            find_t=find_all[0]['dbox_token']
+            id_t=find_all[0]['id']
             print(find_t)
             cursor.execute(f'SELECT * FROM {tabl} WHERE dbox_token = "{find_t}" and status = "False" ') 
             str_ok = cursor.fetchall()
@@ -231,14 +233,14 @@ def get_one_false2():
                print('Нет фалов')
                cursor.execute(f'UPDATE {tabl2} SET status = "OK" WHERE dbox_token = "{find_t}" ')
                db.commit()
-               return None
+               return 'not found'
             name_list=[x['name'] for x in str_ok]
             id_list=[x['id_files'] for x in str_ok]
             cursor.execute(f'UPDATE {tabl2} SET status = "Work" WHERE dbox_token = "{str_ok[0]["dbox_token"]}"')
             db.commit()
         except IndexError :
             return None
-    return str_ok[0]['id'],str_ok[0]['drive'],str_ok[0]['folder_name'],name_list,id_list,str_ok[0]['json'],str_ok[0]['dbox_token'].replace("#","\"")
+    return id_t,str_ok[0]['drive'],str_ok[0]['folder_name'],name_list,id_list,str_ok[0]['json'],str_ok[0]['dbox_token'].replace("#","\"")
 
 create_table_stat()
 #sets_stat(121225,452,452542,'gffgdfg')
