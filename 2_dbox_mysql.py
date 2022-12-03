@@ -48,7 +48,12 @@ def ls_dbox(sektor):
 #@logger.catch
 def drive_new_config(sektor): # Подготовка конфигураций 
    global list_transfer
-   d_tokens=get_one_false2()  # Получили все данные с базы
+   try:
+      d_tokens=get_one_false2()  # Получили все данные с базы
+   except:
+      sleep(30)
+      d_tokens=None
+      
    if d_tokens== 'not found':
       logger.info('У токена не осталось фалов для передачи')
       return
