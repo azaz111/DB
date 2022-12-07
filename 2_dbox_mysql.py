@@ -160,7 +160,11 @@ def stat_progect(potok, ip_ser , work ): # передача с помощью с
              x+=1
              if x == 400:
                  now = datetime.now() + timedelta(minutes=480)
-                 sets_stat(ip_ser, id_gd ,int(time()), f' Work : {tr} | peredano : {pr} | time_wok {ti}')
+                 try:
+                     sets_stat(ip_ser, id_gd ,int(time()), f' Work : {tr} | peredano : {pr} | time_wok {ti}')
+                 except Exception as err: 
+                     apobj.notify(body=f'🚨test:[{ip_ser}] Ошибка {err}')
+                     logger.error(f"🚨[{ip_ser}] Ошибка {err}")
                  print(ip_ser,f'data {now.strftime("%d-%m-%Y %H:%M")} | Work : {tr} | peredano : {pr} | time_wok {ti}')
                  x=0
              elif er!='None':
