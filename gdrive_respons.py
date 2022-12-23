@@ -92,7 +92,7 @@ def move_list_file_round(new_file_l,id_foldnazna):  # Перенос  файла
     except HttpError as err: 
         print(f'[ERROR MOVE] Будем менять Диск Oшибка: {err}' )
         time.sleep(2)
-        return False
+        return True
 
 
 def delete_drive(s_iddrive):  # Перенос  файла в указанную папрку или диск вход : Список айди которые нужно перенести и айди родителя     
