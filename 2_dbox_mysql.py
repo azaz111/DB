@@ -61,7 +61,11 @@ def drive_new_config(sektor): # Подготовка конфигураций
       print(d_tokens)
       try:
          service=service_avtoriz_v3()
-         service.files().get(fileId=d_tokens[1], supportsAllDrives=True, fields='id').execute()
+         try:
+            service.files().get(fileId=d_tokens[1], supportsAllDrives=True, fields='id').execute()
+         except Exception as error :
+            print('Error:', error)
+            logger.warning(f'Error:  {error} ')  
       except HttpError : 
          apobj.notify(body=f'🚨[Забанен исходник !!! Возвращаю False') 
          logger.warning(f' Забанен исходник !!! Возвращаю False ')   
