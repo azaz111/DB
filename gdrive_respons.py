@@ -79,8 +79,8 @@ def move_one_file_round(new_file_l,id_foldnazna):  # Перенос  файла 
 
 def move_list_file_round(new_file_l,id_foldnazna):  # Перенос  файла в указанную папрку или диск вход : Список айди которые нужно перенести и айди родителя     
     service=service_avtoriz_v3()
-    try:
-        for new_file in new_file_l:
+    for new_file in new_file_l:
+        try:
             file = service.files().get(fileId=new_file, supportsAllDrives=True, fields='parents').execute()
             previous_parents = ",".join(file.get('parents'))
             print(f'perenos :{new_file}')
@@ -88,11 +88,11 @@ def move_list_file_round(new_file_l,id_foldnazna):  # Перенос  файла
                                           addParents=id_foldnazna,
                                           supportsAllDrives=True, 
                                           removeParents=previous_parents, fields='id, parents').execute()# перемещаем в бекапную папку
-        return True
-    except HttpError as err: 
-        print(f'[ERROR MOVE] Будем менять Диск Oшибка: {err}' )
-        time.sleep(2)
-        return True
+
+        except HttpError as err: 
+            print(f'[ERROR]  Предположим файл удален | Непривязан  джисон |  \n{err}' )
+            time.sleep(2)
+    return True
 
 
 def delete_drive(s_iddrive):  # Перенос  файла в указанную папрку или диск вход : Список айди которые нужно перенести и айди родителя     
