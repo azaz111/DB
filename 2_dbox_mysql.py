@@ -12,7 +12,7 @@ from requests import get
 try:
    ip_address = get('http://ipinfo.io/json').json()['ip']
 except:
-   ip_address="NONE"
+   ip_address="00.00.00.000"
 try:
    from sshtunnel import SSHTunnelForwarder
    import apprise
